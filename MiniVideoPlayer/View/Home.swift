@@ -31,14 +31,21 @@ struct Home: View {
                     .offset(y: viewModel.offset)
                     .gesture(
                         DragGesture()
-                            .onChanged(onChanged(value:))
+                            .updating($gestureOffset) { (value, state, _) in
+                                state = value.translation.height
+                            }
                             .onEnded(onEnd(value:))
                     )
             }
         }
+        .onChange(of: gestureOffset) { value in
+            onChanged()
+        }
     }
-    func onChanged(value: DragGesture.Value) {
-        viewModel.offset = value.translation.height
+    func onChanged() {
+        if viewModel.offset >= 0 && !viewModel.isMiniPlayer {
+            viewModel.offset = gestureOffset
+        }
     }
     func onEnd(value: DragGesture.Value) {
         withAnimation(.default) {
