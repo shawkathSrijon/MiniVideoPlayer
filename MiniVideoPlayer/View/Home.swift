@@ -41,15 +41,24 @@ struct Home: View {
         .onChange(of: gestureOffset) { value in
             onChanged()
         }
+        .environmentObject(viewModel)
     }
     func onChanged() {
-        if viewModel.offset >= 0 && !viewModel.isMiniPlayer {
+        if gestureOffset > 0 && !viewModel.isMiniPlayer && viewModel.offset + 75 <= viewModel.height {
             viewModel.offset = gestureOffset
+            print(viewModel.offset)
         }
     }
     func onEnd(value: DragGesture.Value) {
         withAnimation(.default) {
-            viewModel.offset = 0
+            if !viewModel.isMiniPlayer {
+                viewModel.offset = 0
+                if value.translation.height > UIScreen.main.bounds.height / 3 {
+                    viewModel.isMiniPlayer = true
+                } else {
+                    viewModel.isMiniPlayer = false
+                }
+            }
         }
     }
 }
